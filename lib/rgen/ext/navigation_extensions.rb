@@ -26,7 +26,7 @@ module NavigationExtensions
       res = of.send(ref.name.to_sym)
       if ref.many
         res.each do |el|
-          arr << el unless res==nil
+          arr << el unless el==nil
         end
       elsif res!=nil
         arr << res
