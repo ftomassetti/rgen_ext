@@ -43,7 +43,6 @@ class ComparisonTest < Test::Unit::TestCase
     end    
 
     class Car < RGen::MetamodelBuilder::MMBase
-      include RGen::Ext::NavigationExtensions
       contains_one_uni 'engine', Engine
     end
 
