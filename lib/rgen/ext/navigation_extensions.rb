@@ -25,12 +25,10 @@ module NavigationExtensions
     ecore.eAllReferences.select {|r| r.containment}.each do |ref|
       res = of.send(ref.name.to_sym)
       if ref.many
-        d = arr.count
         res.each do |el|
           arr << el unless res==nil
         end
       elsif res!=nil
-        d = arr.count
         arr << res
       end
     end

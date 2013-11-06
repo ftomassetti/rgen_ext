@@ -22,6 +22,16 @@ class NavigationExtensionsTest < Test::Unit::TestCase
       contains_many_uni 'entries', AddressBookEntry
     end
 
+    class Engine < RGen::MetamodelBuilder::MMBase
+      has_attr 'code',String
+      has_attr 'horse_power',Integer
+    end    
+
+    class Car < RGen::MetamodelBuilder::MMBase
+      include RGen::Ext::NavigationExtensions
+      contains_one_uni 'engine', Engine
+    end
+
   end
    
   def setup
@@ -54,6 +64,10 @@ class NavigationExtensionsTest < Test::Unit::TestCase
     @address_book_1.addEntries(@jones_book_entry)
     @address_book_1.addEntries(@smith_book_entry)
     @address_book_1.addEntries(@green_book_entry)
+
+    @ferrari_v8   = TestMetamodel::Engine.new({:horse_power => 800, :code => 'Ferrari-V8'})
+    @ferrari_enzo = TestMetamodel::Car.new
+    @ferrari_enzo.engine = @ferrari_v8
   end
 
   def test_root_is_self_object_for_dangling_object
@@ -101,6 +115,10 @@ class NavigationExtensionsTest < Test::Unit::TestCase
     assert_equal(
       [@jones_book_entry,@smith_book_entry,@green_book_entry], 
       @address_book_1.all_children)
+  end 
+
+  def test_all_children_single_containement
+    assert_equal([@ferrari_v8], @ferrari_enzo.all_children)
   end 
 
   def test_all_children_deep_not_empty

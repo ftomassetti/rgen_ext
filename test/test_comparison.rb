@@ -34,6 +34,20 @@ class ComparisonTest < Test::Unit::TestCase
     end
 
   end
+
+  module CarMetamodel
+
+    class Engine < RGen::MetamodelBuilder::MMBase
+      has_attr 'code',String
+      has_attr 'horse_power',Integer
+    end    
+
+    class Car < RGen::MetamodelBuilder::MMBase
+      include RGen::Ext::NavigationExtensions
+      contains_one_uni 'engine', Engine
+    end
+
+  end
    
   def setup
     # Ordered data
@@ -105,7 +119,22 @@ class ComparisonTest < Test::Unit::TestCase
     @world_4 = UnorderedTestMetamodel::World.new
     @world_4.addCountries @c_2
     @world_4.addCountries @c_1
-    @world_4.addCountries @c_2     
+    @world_4.addCountries @c_2    
+
+    # Car test data
+    @ferrari_v8   = CarMetamodel::Engine.new({:horse_power => 800, :code => 'Ferrari-V8'})
+    @ferrari_enzo = CarMetamodel::Car.new
+    @ferrari_enzo.engine = @ferrari_v8
+
+    @ferrari_v8b  = CarMetamodel::Engine.new({:horse_power => 800, :code => 'Ferrari-V8'})
+    @ferrari_superenzo = CarMetamodel::Car.new
+    @ferrari_superenzo.engine = @ferrari_v8b
+
+    @ferrari_v9  = CarMetamodel::Engine.new({:horse_power => 900, :code => 'Ferrari-V9'})
+    @ferrari_superextraenzo = CarMetamodel::Car.new
+    @ferrari_superextraenzo.engine = @ferrari_v9
+
+    @auto_without_engine = CarMetamodel::Car.new 
   end
 
   def test_deep_comparator_based_on_unordered_attributes
@@ -230,5 +259,18 @@ class ComparisonTest < Test::Unit::TestCase
       assert_equal true,DeepComparator.eql?(@jones_work_address,same_as_jones_work_address)
       assert_equal true,DeepComparator.eql?(@jones_book_entry,similar_to_jones_book_entry)      
   end  
+
+  def test_comparison_with_null_reference_shallow_comparator
+    assert_equal true, ShallowComparator.eql?(@ferrari_enzo,@auto_without_engine)
+  end
+
+  def test_comparison_with_null_reference_deep_comparator
+    assert_equal false, DeepComparator.eql?(@ferrari_enzo,@auto_without_engine)
+  end  
+
+  def test_comparison_only_child_equal_deep_comparator
+    assert_equal true,  DeepComparator.eql?(@ferrari_enzo,@ferrari_superenzo)
+    assert_equal false, DeepComparator.eql?(@ferrari_enzo,@ferrari_superextraenzo)
+  end
 
 end
