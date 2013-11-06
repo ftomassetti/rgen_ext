@@ -22,7 +22,7 @@ module NavigationExtensions
   def all_children(of=self)
     arr = []
     ecore = of.class.ecore
-    ecore.eAllReferences.select {|r| r.containment}.each do |ref|
+    ecore.eAllReferences.sort_by{|r| r.name}.select {|r| r.containment}.each do |ref|
       res = of.send(ref.name.to_sym)
       if ref.many
         res.each do |el|
